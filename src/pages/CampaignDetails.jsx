@@ -5,6 +5,7 @@ import { useStateContext } from "../context";
 import { CountBox, CustomButton, Loader } from "../components";
 import { calculateBarPercentage, daysLeft } from "../utils";
 import { thirdweb } from "../assets";
+import { toast } from "react-toastify";
 
 const CampaignDetails = () => {
   const { state } = useLocation();
@@ -28,6 +29,7 @@ const CampaignDetails = () => {
   
 
   const handleDonate = async () => {
+    if(amount<=0) return toast.error('Enter valid amount!')
     setIsLoading(true)
     await donate(state.pId, amount);
     navigate("/")
@@ -147,8 +149,9 @@ const CampaignDetails = () => {
             <div className="mt-[30px]">
               <input
                 type="number"
-                placeholder="ETH 0.01"
+                placeholder="ETH 0.05"
                 step="0.01"
+                min="0.01"
                 className="w-full py-[10px] sm:px-[20px] px-[15px] outline-none border-[1px] border-[#3a3a43] bg-transparent font-epilogue text-white text-[18px] leading-[30px] placeholder:text-[#4b5264] rounded-[10px]"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}

@@ -5,6 +5,7 @@ import { money } from "../assets";
 import { CustomButton, FormField, Loader } from "../components";
 import { checkIfImage } from "../utils";
 import { useStateContext } from '../context';
+import { toast } from "react-toastify";
 
 const CreateCampaign = () => {
   const navigate = useNavigate();
@@ -25,6 +26,9 @@ const CreateCampaign = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if(form.target <= 0){
+      return toast.error('Target should be greater than 0!')
+    }
     checkIfImage(form.image, async (exists) => {
       if(exists) {
         setIsLoading(true)
