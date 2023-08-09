@@ -4,12 +4,13 @@ import { v4 as uuidv4 } from "uuid";
 import { loader } from "../assets";
 import { FundCard } from "./";
 
-const DisplayCampaigns = ({title, isLoading, campaigns}) => {
+const DisplayCampaigns = ({ title, isLoading, campaigns }) => {
   const navigate = useNavigate();
 
   const handleNavigate = (campaign) => {
     navigate(`/campaign-details/${campaign.title}`, { state: campaign });
   };
+
   return (
     <div>
       <h1 className="font-epilogue font-semibold text-[18px] text-white text-left">
@@ -18,11 +19,13 @@ const DisplayCampaigns = ({title, isLoading, campaigns}) => {
 
       <div className="flex flex-wrap mt-[20px] gap-[26px]">
         {isLoading && (
-          <img
-            src={loader}
-            alt="loader"
-            className="w-[100px] h-[100px] object-contain"
-          />
+          <div className="flex flex-1 justify-center">
+            <img
+              src={loader}
+              alt="loader"
+              className="w-[100px] h-[100px] object-contain"
+            />
+          </div>
         )}
 
         {!isLoading && campaigns.length === 0 && (

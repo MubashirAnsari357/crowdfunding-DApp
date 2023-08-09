@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 import { useStateContext } from "../context";
-import { CountBox, CustomButton, Loader } from "../components";
+import { CountBox, CustomButton, Loader, Locked } from "../components";
 import { calculateBarPercentage, daysLeft } from "../utils";
-import { thirdweb } from "../assets";
+import { thirdweb, ethLogo } from "../assets";
 import { toast } from "react-toastify";
 
 const CampaignDetails = () => {
@@ -61,7 +61,7 @@ const CampaignDetails = () => {
         </div>
 
         <div className="flex md:w-[150px] w-full flex-wrap justify-between gap-[30px]">
-          <CountBox title="Days Left" value={remainingDays} />
+          <CountBox title="Days Left" value={remainingDays < 0 ? 'Expired' : remainingDays} />
           <CountBox
             title={`Raised of ${state.target}`}
             value={state.amountCollected}
@@ -118,14 +118,15 @@ const CampaignDetails = () => {
                 donators.map((item, index) => (
                   <div
                     key={`${item.donator}-${index}`}
-                    className="flex justify-between items-center gap-4"
+                    className="flex justify-between items-center gap-1"
                   >
-                    <p className="font-epilogue font-normal text-[16px] text-[#b2b3bd] leading-[26px] break-ll">
+                    <p className="flex-1 font-epilogue font-normal text-[10px] sm:text-[16px] text-[#b2b3bd] leading-[26px] break-ll">
                       {index + 1}. {item.donator}
                     </p>
-                    <p className="font-epilogue font-normal text-[16px] text-[#808191] leading-[26px] break-ll">
+                    <p className="font-epilogue font-normal text-[10px] sm:text-[16px] text-[#808191] leading-[26px] break-ll">
                       {item.donation}
                     </p>
+                    <img src={ethLogo} alt="ethLogo" className="w-[15px] h-[15px] sm:w-[25px] sm:h-[25px] object-contain" />
                   </div>
                 ))
               ) : (
@@ -142,7 +143,8 @@ const CampaignDetails = () => {
             Fund
           </h4>
 
-          <div className="mt-[20px] flex flex-col p-4 bg-[#1c1c24] rounded-[10px]">
+          <div className="relative mt-[20px] flex flex-col p-4 bg-[#1c1c24] rounded-[10px]">
+            {remainingDays < 0 && <Locked />}
             <p className="font-epilogue fount-medium text-[20px] leading-[30px] text-center text-[#808191]">
               Fund the campaign
             </p>
@@ -171,7 +173,7 @@ const CampaignDetails = () => {
                 btnType="button"
                 title="Fund Campaign"
                 styles="w-full bg-[#8c6dfd]"
-                handleClick={handleDonate}
+                handleClick={()=> remainingDays >= 0 && handleDonate()}
               />
             </div>
           </div>

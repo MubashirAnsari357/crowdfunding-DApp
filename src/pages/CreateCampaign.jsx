@@ -4,10 +4,13 @@ import { ethers } from "ethers";
 import { money } from "../assets";
 import { CustomButton, FormField, Loader } from "../components";
 import { checkIfImage } from "../utils";
-import { useStateContext } from '../context';
+import { useStateContext } from "../context";
 import { toast } from "react-toastify";
 
 const CreateCampaign = () => {
+
+  const currentDate = new Date().toISOString().split('T')[0];
+
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
@@ -18,28 +21,36 @@ const CreateCampaign = () => {
     deadline: "",
     image: "",
   });
-  const { createCampaign } = useStateContext();
+  const { createCampaign, connect, address } = useStateContext();
 
   const handleFormFieldChange = (fieldName, e) => {
-    setForm({...form, [fieldName]: e.target.value})
-  }
+    setForm({ ...form, [fieldName]: e.target.value });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if(form.target <= 0){
-      return toast.error('Target should be greater than 0!')
+    if (form.target <= 0) {
+      return toast.error("Target should be greater than 0!");
     }
+
+    if(form.deadline <= currentDate){
+      return toast.error('Deadline must be in the future!')
+    }
+
     checkIfImage(form.image, async (exists) => {
-      if(exists) {
-        setIsLoading(true)
-        await createCampaign({ ...form, target: ethers.utils.parseUnits(form.target, 18)})
+      if (exists) {
+        setIsLoading(true);
+        await createCampaign({
+          ...form,
+          target: ethers.utils.parseUnits(form.target, 18),
+        });
         setIsLoading(false);
-        navigate('/');
+        navigate("/");
       } else {
-        alert('Provide valid image URL')
-        setForm({ ...form, image: '' });
+        toast.error("Provide valid image URL!");
+        setForm({ ...form, image: "" });
       }
-    })
+    });
   };
 
   return (
@@ -61,14 +72,14 @@ const CreateCampaign = () => {
             placeholder="Enter your name"
             inputType="text"
             value={form.name}
-            handleChange={(e) => handleFormFieldChange('name', e)}
+            handleChange={(e) => handleFormFieldChange("name", e)}
           />
           <FormField
             labelName="Campaign Title *"
             placeholder="Write Campaign title"
             inputType="text"
             value={form.title}
-            handleChange={(e) => handleFormFieldChange('title', e)}
+            handleChange={(e) => handleFormFieldChange("title", e)}
           />
         </div>
         <FormField
@@ -76,7 +87,7 @@ const CreateCampaign = () => {
           placeholder="Write your story"
           isTextArea
           value={form.description}
-          handleChange={(e) => handleFormFieldChange('description', e)}
+          handleChange={(e) => handleFormFieldChange("description", e)}
         />
         <div className="w-full flex justify-start items-center p-4 bg-[#8c6dfd] h-[120px] rounded-[10px]">
           <img
@@ -94,14 +105,14 @@ const CreateCampaign = () => {
             placeholder="ETH 0.5"
             inputType="number"
             value={form.target}
-            handleChange={(e) => handleFormFieldChange('target', e)}
+            handleChange={(e) => handleFormFieldChange("target", e)}
           />
           <FormField
             labelName="End Date *"
             placeholder="End Date"
             inputType="date"
             value={form.deadline}
-            handleChange={(e) => handleFormFieldChange('deadline', e)}
+            handleChange={(e) => handleFormFieldChange("deadline", e)}
           />
         </div>
         <FormField
@@ -109,14 +120,20 @@ const CreateCampaign = () => {
           placeholder="Put your image URL here"
           inputType="text"
           value={form.image}
-          handleChange={(e) => handleFormFieldChange('image', e)}
+          handleChange={(e) => handleFormFieldChange("image", e)}
         />
         <div className="flex justify-center items-center mt-[40px]">
-          <CustomButton
+          {!address ? <CustomButton
+            btnType="button"
+            title="Connect your wallet"
+            styles="bg-[#8c6dfd]"
+            handleClick={connect()}
+            
+          /> : <CustomButton
             btnType="submit"
             title="Submit new campaign"
             styles="bg-[#1dc071]"
-          />
+          />}
         </div>
       </form>
     </div>
